@@ -6,106 +6,185 @@ import ProgressBar from './components/ProgressBar';
 import CalendarView from './components/CalendarView';
 import StatisticsDashboard from './components/StatisticsDashboard';
 import DataExport from './components/DataExport';
+import CirclesView from './components/CirclesView';
+import { initialCircles } from './data/circles';
+
+const tabs = [
+  { id: 'habits', label: 'Today', icon: '◌' },
+  { id: 'circles', label: 'Community', icon: '◎' },
+  { id: 'calendar', label: 'Archive', icon: '□' },
+  { id: 'statistics', label: 'Insights', icon: '↗' },
+  { id: 'data', label: 'Data', icon: '⋯' },
+];
+
+const tabTitles = {
+  habits: 'Today',
+  circles: 'Community',
+  calendar: 'Archive',
+  statistics: 'Insights',
+  data: 'Data',
+};
 
 function App() {
   const [habits, setHabits] = useLocalStorage('habits', []);
   const [completions, setCompletions] = useLocalStorage('completions', {});
+  const [circles, setCircles] = useLocalStorage('accountability-circles-v1', initialCircles);
   const [activeTab, setActiveTab] = useState('habits');
 
-  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  const formattedDate = new Intl.DateTimeFormat('en', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  }).format(now);
 
   const addHabit = (newHabit) => {
     const habit = {
       id: Date.now().toString(),
       ...newHabit,
       createdAt: new Date().toISOString(),
-      color: getRandomColor(),
-      icon: getRandomIcon(),
     };
     setHabits([...habits, habit]);
   };
 
   const editHabit = (id, updatedHabit) => {
-    setHabits(habits.map(h => h.id === id ? { ...h, ...updatedHabit } : h));
+    setHabits(habits.map((habit) => (
+      habit.id === id ? { ...habit, ...updatedHabit } : habit
+    )));
   };
 
   const deleteHabit = (id) => {
-    setHabits(habits.filter(h => h.id !== id));
-    const newCompletions = { ...completions };
-    delete newCompletions[id];
-    setCompletions(newCompletions);
+    setHabits(habits.filter((habit) => habit.id !== id));
+    const nextCompletions = { ...completions };
+    delete nextCompletions[id];
+    setCompletions(nextCompletions);
   };
 
   const toggleComplete = (id) => {
     const habitCompletions = completions[id] || [];
     const isCompleted = habitCompletions.includes(today);
-    if (isCompleted) {
-      setCompletions({
-        ...completions,
-        [id]: habitCompletions.filter(date => date !== today),
-      });
-    } else {
-      setCompletions({
-        ...completions,
-        [id]: [...habitCompletions, today],
-      });
+
+    setCompletions({
+      ...completions,
+      [id]: isCompleted
+        ? habitCompletions.filter((date) => date !== today)
+        : [...habitCompletions, today],
+    });
+  };
+
+  const getCurrentStreak = (habitId) => {
+    const habitCompletions = completions[habitId] || [];
+    if (!habitCompletions.includes(today)) return 0;
+
+    let streak = 0;
+    const date = new Date(today);
+    while (habitCompletions.includes(date.toISOString().split('T')[0])) {
+      streak += 1;
+      date.setDate(date.getDate() - 1);
     }
+    return streak;
   };
 
-  const completedToday = habits.filter(habit => (completions[habit.id] || []).includes(today)).length;
+  const completedToday = habits.filter((habit) => (
+    completions[habit.id] || []
+  ).includes(today)).length;
+  const completionPercentage = habits.length
+    ? Math.round((completedToday / habits.length) * 100)
+    : 0;
+  const longestStreak = habits.length
+    ? Math.max(...habits.map((habit) => getCurrentStreak(habit.id)))
+    : 0;
+  const activeTitle = tabTitles[activeTab];
 
-  const getMotivationalMessage = () => {
-    const percentage = habits.length > 0 ? Math.round((completedToday / habits.length) * 100) : 0;
-    if (percentage === 100 && habits.length > 0) return "🎉 Amazing! All habits completed today!";
-    if (percentage >= 75) return "🚀 Great progress! Keep it up!";
-    if (percentage >= 50) return "💪 You're doing well! Stay consistent!";
-    if (percentage >= 25) return "🌟 Good start! Every step counts!";
-    return "🌱 Every journey begins with a single step!";
+  const openToday = () => {
+    setActiveTab('habits');
+    window.requestAnimationFrame(() => {
+      document.getElementById('habit-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   };
 
-  const tabs = [
-    { id: 'habits', label: 'Habits', icon: '🎯' },
-    { id: 'calendar', label: 'Calendar', icon: '📅' },
-    { id: 'statistics', label: 'Statistics', icon: '📊' },
-    { id: 'data', label: 'Data', icon: '💾' },
-  ];
+  const openCircleCreator = () => {
+    setActiveTab('circles');
+    window.requestAnimationFrame(() => {
+      document.getElementById('create-circle-trigger')?.click();
+    });
+  };
+
+  const primaryAction = activeTab === 'circles'
+    ? { label: 'New circle', onClick: openCircleCreator }
+    : { label: 'Add habit', onClick: openToday };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="text-center mb-8 animate-fade-in-up">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            🌟 Habit Tracker
-          </h1>
-          <p className="text-gray-600 text-lg">{getMotivationalMessage()}</p>
-        </div>
+    <div className="app-shell">
+      <aside className="app-sidebar">
+        <div className="sidebar-top">
+          <a className="brand" href="#top" aria-label="Habit home">
+            <span className="brand-mark" aria-hidden="true">●</span>
+            <span>habit</span>
+          </a>
 
-        {/* Navigation Tabs */}
-        <div className="mb-6 bg-white rounded-xl shadow-lg p-2 border border-gray-100">
-          <div className="flex space-x-1">
+          <span className="sidebar-label">Workspace</span>
+
+          <nav className="tab-bar" aria-label="Habit tracker sections">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md transform scale-105'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={activeTab === tab.id ? 'tab-button is-active' : 'tab-button'}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
               >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
+                <span className="tab-icon" aria-hidden="true">{tab.icon}</span>
+                <span>{tab.label}</span>
               </button>
             ))}
-          </div>
+          </nav>
         </div>
 
-        {/* Tab Content */}
-        <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <div className="sidebar-bottom">
+          <button type="button" className="new-habit-button" onClick={primaryAction.onClick}>
+            <span aria-hidden="true">+</span>
+            {activeTab === 'circles' ? 'New circle' : 'New habit'}
+          </button>
+
+        </div>
+      </aside>
+
+      <main className={`app-main ${activeTab === 'circles' ? 'is-community' : ''}`} id="top">
+        <header className="app-main-header">
+          <h1>{activeTitle}</h1>
+          <div className="header-actions">
+            <span>{formattedDate}</span>
+            <button type="button" className="primary-button" onClick={primaryAction.onClick}>
+              <span aria-hidden="true">+</span>
+              {primaryAction.label}
+            </button>
+          </div>
+        </header>
+
+        <section className="app-content" id="habit-workspace">
           {activeTab === 'habits' && (
             <>
-              <AddHabitForm onAddHabit={addHabit} />
-              <ProgressBar completed={completedToday} total={habits.length} />
+              <div className="dashboard-summary" aria-label="Today’s habit summary">
+                <article className="summary-card summary-card-highlight">
+                  <span>TODAY&apos;S SCORE</span>
+                  <strong>{String(completionPercentage).padStart(2, '0')}%</strong>
+                </article>
+                <article className="summary-card">
+                  <span>COMPLETED</span>
+                  <strong>{String(completedToday).padStart(2, '0')}<em> / {String(habits.length).padStart(2, '0')}</em></strong>
+                </article>
+                <article className="summary-card">
+                  <span>BEST STREAK</span>
+                  <strong>{String(longestStreak).padStart(2, '0')}<em> days</em></strong>
+                </article>
+              </div>
+
+              <div className="habits-overview">
+                <AddHabitForm onAddHabit={addHabit} />
+                <ProgressBar completed={completedToday} total={habits.length} />
+              </div>
               <HabitList
                 habits={habits}
                 completions={completions}
@@ -120,38 +199,21 @@ function App() {
             <CalendarView completions={completions} habits={habits} />
           )}
 
+          {activeTab === 'circles' && (
+            <CirclesView circles={circles} setCircles={setCircles} />
+          )}
+
           {activeTab === 'statistics' && (
             <StatisticsDashboard habits={habits} completions={completions} />
           )}
 
           {activeTab === 'data' && (
-            <DataExport habits={habits} completions={completions} />
+            <DataExport habits={habits} completions={completions} circles={circles} />
           )}
-        </div>
-
-        {habits.length === 0 && activeTab === 'habits' && (
-          <div className="text-center mt-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <div className="text-6xl mb-4 animate-pulse-gentle">🎯</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Ready to build better habits?</h3>
-            <p className="text-gray-500">Start by adding your first habit above!</p>
-          </div>
-        )}
-      </div>
+        </section>
+      </main>
     </div>
   );
-}
-
-function getRandomColor() {
-  const colors = [
-    'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500',
-    'bg-indigo-500', 'bg-red-500', 'bg-yellow-500', 'bg-teal-500'
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-}
-
-function getRandomIcon() {
-  const icons = ['💧', '🏃', '📚', '🎵', '🍎', '🧘', '💻', '🎨', '🏋️', '🛏️'];
-  return icons[Math.floor(Math.random() * icons.length)];
 }
 
 export default App;

@@ -1,17 +1,17 @@
-function DataExport({ habits, completions }) {
+function DataExport({ habits, completions, circles }) {
   const exportData = () => {
     const data = {
       habits,
       completions,
+      circles,
       exportDate: new Date().toISOString(),
-      version: "1.0"
+      version: '2.0',
     };
 
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const dataBlob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
-
     const link = document.createElement('a');
+
     link.href = url;
     link.download = `habit-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
@@ -25,95 +25,65 @@ function DataExport({ habits, completions }) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (loadEvent) => {
       try {
-        const importedData = JSON.parse(e.target.result);
+        const importedData = JSON.parse(loadEvent.target.result);
 
         if (importedData.habits && importedData.completions) {
-          // Here you would typically call a function to update the app state
-          // For now, we'll just show a success message
-          alert('Data imported successfully! Please refresh the page to see changes.');
-          console.log('Imported data:', importedData);
+          window.localStorage.setItem('habits', JSON.stringify(importedData.habits));
+          window.localStorage.setItem('completions', JSON.stringify(importedData.completions));
+          if (Array.isArray(importedData.circles)) {
+            window.localStorage.setItem('accountability-circles-v1', JSON.stringify(importedData.circles));
+          }
+          window.alert('Backup restored. The page will now reload.');
+          window.location.reload();
         } else {
-          alert('Invalid file format. Please select a valid habit tracker backup file.');
+          window.alert('This file is not a valid Habit backup.');
         }
       } catch (error) {
-        alert('Error reading file. Please make sure it\'s a valid JSON file.');
         console.error('Import error:', error);
+        window.alert('The selected file could not be read.');
       }
     };
     reader.readAsText(file);
   };
 
   const clearAllData = () => {
-    if (window.confirm('Are you sure you want to clear all habit data? This action cannot be undone.')) {
-      localStorage.removeItem('habits');
-      localStorage.removeItem('completions');
-      alert('All data cleared. Please refresh the page.');
-    }
+    const shouldClear = window.confirm('Clear every habit, completion, and circle? This cannot be undone.');
+    if (!shouldClear) return;
+
+    window.localStorage.removeItem('habits');
+    window.localStorage.removeItem('completions');
+    window.localStorage.removeItem('accountability-circles-v1');
+    window.location.reload();
   };
 
   return (
-    <div className="mb-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
-      <div className="flex items-center mb-6">
-        <div className="text-2xl mr-3">💾</div>
-        <h2 className="text-2xl font-semibold text-gray-800">Data Management</h2>
-      </div>
+    <section className="data-section" aria-label="Data management">
+      <div className="data-grid">
+        <article className="data-card">
+          <h3>Export backup</h3>
+          <p>Download habits, completions, and accountability circles as a readable JSON file.</p>
+          <button type="button" onClick={exportData} className="primary-button">Download data</button>
+        </article>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Export Data */}
-        <div className="text-center">
-          <button
-            onClick={exportData}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
-          >
-            📤 Export Data
-          </button>
-          <p className="text-sm text-gray-600 mt-2">
-            Download your habits and progress as a JSON file
-          </p>
-        </div>
-
-        {/* Import Data */}
-        <div className="text-center">
-          <label className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg cursor-pointer block">
-            📥 Import Data
-            <input
-              type="file"
-              accept=".json"
-              onChange={importData}
-              className="hidden"
-            />
+        <article className="data-card">
+          <h3>Restore backup</h3>
+          <p>Replace local data with a previously exported Habit backup.</p>
+          <label className="ghost-button file-button">
+            Choose file
+            <input type="file" accept=".json,application/json" onChange={importData} />
           </label>
-          <p className="text-sm text-gray-600 mt-2">
-            Upload a previously exported backup file
-          </p>
-        </div>
+        </article>
 
-        {/* Clear Data */}
-        <div className="text-center">
-          <button
-            onClick={clearAllData}
-            className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
-          >
-            🗑️ Clear All Data
-          </button>
-          <p className="text-sm text-gray-600 mt-2">
-            Permanently delete all habits and progress
-          </p>
-        </div>
+        <article className="data-card danger-card">
+          <h3>Clear local data</h3>
+          <p>Permanently remove all habits, completions, and circle data from this browser.</p>
+          <button type="button" onClick={clearAllData} className="ghost-button">Clear everything</button>
+        </article>
       </div>
 
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h3 className="font-semibold text-blue-800 mb-2">💡 Data Management Tips</h3>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>• Export your data regularly to create backups</li>
-          <li>• Imported data will merge with existing habits</li>
-          <li>• Clear data action cannot be undone</li>
-          <li>• All data is stored locally in your browser</li>
-        </ul>
-      </div>
-    </div>
+    </section>
   );
 }
 
