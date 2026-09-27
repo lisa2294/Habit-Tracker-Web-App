@@ -28,13 +28,13 @@ The sample **Momentum Lab** circle is seeded so the complete experience is visib
 ## Run locally
 
 ```bash
-git clone https://github.com/TheUnknown550/Habit-Tracker-Web-App.git
+git clone https://github.com/lisa2294/Habit-Tracker-Web-App.git
 cd Habit-Tracker-Web-App
-npm install
+npm ci
 npm run dev
 ```
 
-Vite prints the local URL after startup. The configured production base path supports the existing GitHub Pages deployment.
+Open the URL Vite prints, normally `http://localhost:5173/Habit-Tracker-Web-App/`. The configured production base path supports the existing GitHub Pages workflow.
 
 ## Quality checks
 
@@ -53,6 +53,7 @@ npm run build
 ## Documentation
 
 - [Installation guide](INSTALLATION.md)
+- [Student demo guide](docs/student-demo-guide.md)
 - [Design system and product UI rules](design.md)
 - [Accountability Circles PRD](docs/accountability-circles-prd.md)
 
