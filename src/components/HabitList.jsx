@@ -9,47 +9,54 @@ function HabitList({ habits, completions, onToggleComplete, onEditHabit, onDelet
 
     let streak = 0;
     const date = new Date(today);
+
     while (habitCompletions.includes(date.toISOString().split('T')[0])) {
       streak += 1;
       date.setDate(date.getDate() - 1);
     }
+
     return streak;
   };
 
   const totalStreaks = habits.reduce((sum, habit) => sum + getStreak(habit.id), 0);
-  const longestStreak = habits.length
-    ? Math.max(...habits.map((habit) => getStreak(habit.id)))
-    : 0;
+  const longestStreak = habits.length > 0 ? Math.max(...habits.map((habit) => getStreak(habit.id))) : 0;
 
   return (
-    <section className="habit-section" aria-labelledby="habit-list-title">
-      <div className="section-heading">
-        <h2 id="habit-list-title">Habits</h2>
-
-        <div className="streak-summary" aria-label="Streak summary">
-          <div>
-            <span>TOTAL STREAK</span>
-            <strong>{String(totalStreaks).padStart(2, '0')}</strong>
-          </div>
-          <div>
-            <span>LONGEST</span>
-            <strong>{String(longestStreak).padStart(2, '0')}D</strong>
-          </div>
+    <section className="habits-section" aria-label="Your habits">
+      <header className="inline-section-header">
+        <div>
+          <p className="eyebrow">YOUR HABITS</p>
+          <p className="inline-section-header__summary">
+            {habits.length === 0 ? 'Your list is empty.' : `${habits.length} habit${habits.length === 1 ? '' : 's'} in today’s list.`}
+          </p>
         </div>
-      </div>
+
+        {habits.length > 0 && (
+          <dl className="streak-summary">
+            <div>
+              <dt>CURRENT STREAKS</dt>
+              <dd>{totalStreaks} days</dd>
+            </div>
+            <div>
+              <dt>LONGEST</dt>
+              <dd>{longestStreak} days</dd>
+            </div>
+          </dl>
+        )}
+      </header>
 
       {habits.length === 0 ? (
-        <div className="empty-state">
-          <h3>No habits yet</h3>
-          <p>Add your first habit above.</p>
+        <div className="content-card empty-state">
+          <p className="eyebrow">NOTHING TO CHECK OFF YET</p>
+          <p className="empty-state__title">Add the first habit you want to complete today.</p>
+          <p>Once it is in the list, use the check control to record completion.</p>
         </div>
       ) : (
         <div className="habit-list">
-          {habits.map((habit, index) => (
+          {habits.map((habit) => (
             <HabitItem
               key={habit.id}
               habit={habit}
-              index={index + 1}
               isCompletedToday={(completions[habit.id] || []).includes(today)}
               streak={getStreak(habit.id)}
               onToggleComplete={onToggleComplete}

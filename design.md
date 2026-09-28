@@ -1,385 +1,140 @@
-# Ramp — Style Reference
-> Editorial finance desk, black-and-white pages with a single neon highlighter. A near-monochrome publication surface where one vivid chartreuse mark turns every interaction into a money signal.
-
-**Theme:** light
-
-Source measurements are normalized; roles and recommendations are interpreted. Font summary lists are independent, not paired by position. HTML examples are reconstructions, not source components.
-
-Ramp operates as a black-and-white editorial system punctuated by a single highlighter-yellow accent — the visual equivalent of a finance journal with a neon Sharpie. The interface stays nearly monochrome: warm off-white canvas, white cards, hairline gray borders, and deep near-black text. That one vivid chartreuse (#e4f222) appears only where money moves — CTAs, live counters, active states — making every action feel switched-on. Typography is a single-weight, neo-grotesque custom face (lausanne) at 400, used at large display sizes with tight leading (lineHeight ~1.0 at 64px) and positive tracking on small uppercase labels. Components are flat, hairline-bordered, and shadow-free: cards rest on borders, not shadows, with 12–16px radii; buttons are 6px-radius rectangles. Density is comfortable, rhythm is 8/12/16/24px, and motion is moderate and utility-focused rather than decorative.
-
-## Habit App Product Rules
-
-- Use one page title per view: Today, Archive, Insights, or Data. Never repeat the active view with a second editorial headline or section title.
-- Prioritize action and status in the first viewport: today’s score, completed count, best streak, add-habit controls, and daily progress.
-- Explanatory copy must earn its space. Keep it only where it prevents an error, clarifies a destructive data action, or helps an empty state; otherwise prefer a direct label and value.
-- Keep dashboard cards compact and operational. Avoid marketing-style eyebrow + headline + paragraph stacks inside the signed-in product.
-- Desktop uses a fixed left sidebar. At tablet sizes it becomes a sticky top bar; at mobile sizes navigation becomes an even four-item row and metric cards reflow without horizontal scrolling.
-- The responsive floor is 320px. At 640px and below, the primary score spans the row, secondary metrics sit two-up, and the header action moves beneath the page title.
+# Habit Ledger — Visual Design Rules
 
-## Tokens — Colors
+## Design intent
 
-| Name | Value | Token | Role |
-|------|-------|-------|------|
-| Highlighter Yellow | `#e4f222` | `--color-highlighter-yellow` | Primary action fill, live counters, active-state highlights — the only chromatic accent in the system, making CTAs read as switched-on |
-| Ink | `#0c0a08` | `--color-ink` | Primary text, heading fill, dark surface backgrounds — near-black with the faintest warm cast |
-| Obsidian | `#1a1919` | `--color-obsidian` | Dark panels, navigation bar, inverted sections — slightly warmer and lighter than Ink for tonal variation |
-| Paper | `#ffffff` | `--color-paper` | Card surfaces, modal panels, light fills, reversed text on dark backgrounds |
-| Bone | `#f4f2f0` | `--color-bone` | Page canvas, subtle card washes, link background hover states — warm off-white base layer |
-| Ash | `#6d6c6b` | `--color-ash` | Secondary text, hushed captions, muted labels — the 60% opacity voice of --text-primary |
-| Hairline | `#e5e7eb` | `--color-hairline` | Card borders, divider lines, structural outlines — 1px hairlines replace shadows as the elevation primitive |
-| Smoke | `#d3d3d3` | `--color-smoke` | Subtle borders, muted backgrounds, skeleton states — the 200-step in the black scale |
+Habit Ledger is a signed-in-feeling personal workspace for a daily habit practice. It should feel like an efficient application, not a product introduction: current work, status, and the next action remain visible while the user moves between views. The surface is calm, typographic, and deliberately flat. Progress is important information, so the UI uses a single highlighter-yellow signal only when an action is available, navigation is active, or a live completion metric changes.
 
-## Tokens — Typography
+The existing product capabilities remain in scope:
 
-### lausanne — Sole typeface across the entire system — headings, body, UI labels, nav, buttons, inputs. A single weight (400) forces hierarchy through size and tracking rather than weight contrast. · `--font-lausanne`
-- **Substitute:** Inter, IBM Plex Sans, or Söhne
-- **Weights:** 400
-- **Sizes:** 10px, 13px, 14px, 16px, 18px, 20px, 24px, 28px, 40px, 48px, 64px
-- **Line height:** 0.74–2.20 (tight at display, generous at caption)
-- **Letter spacing:** 0.018em at 10px (uppercase micro-labels), 0.05em at small uppercase, 0 (normal) at body and display sizes
-- **OpenType features:** `"ss01" on`
-- **Role:** Sole typeface across the entire system — headings, body, UI labels, nav, buttons, inputs. A single weight (400) forces hierarchy through size and tracking rather than weight contrast.
+- Add, edit, delete, and complete habits.
+- Show the daily progress tally and current streaks.
+- Browse completion history in the calendar.
+- Review statistics, rankings, and the recent activity chart.
+- Export, import, and clear locally stored data.
 
-### Type Scale
+## Foundations
 
-| Role | Family | Weight | Size | Line Height | Letter Spacing | Token |
-|------|--------|--------|------|-------------|----------------|-------|
-| caption | — | — | 10px | 2.2 | 0.18px | `--text-caption` |
-| body | — | — | 16px | 1.5 | — | `--text-body` |
-| subheading | — | — | 20px | 1.3 | — | `--text-subheading` |
-| heading-sm | — | — | 24px | 1.17 | — | `--text-heading-sm` |
-| heading | — | — | 28px | 1.14 | — | `--text-heading` |
-| heading-lg | — | — | 40px | 1.05 | — | `--text-heading-lg` |
-| display | — | — | 64px | 1 | — | `--text-display` |
+### Color
 
-## Tokens — Spacing & Shapes
+| Token | Value | Use |
+| --- | --- | --- |
+| `--color-highlighter-yellow` | `#e4f222` | Filled primary actions, active navigation, completed/live counters, and the current bar in a chart. This is the only chromatic accent. |
+| `--color-ink` | `#0c0a08` | Primary text, borders for strong controls, chart bars. |
+| `--color-obsidian` | `#1a1919` | Desktop sidebar and mobile app navigation. |
+| `--color-paper` | `#ffffff` | Cards, form fields, status strip, and sticky header. |
+| `--color-bone` | `#f4f2f0` | Page canvas and quiet surfaces. |
+| `--color-ash` | `#6d6c6b` | Supporting copy, dates, labels, and captions. |
+| `--color-hairline` | `#e5e7eb` | One-pixel structural borders and dividers. |
+| `--color-smoke` | `#d3d3d3` | Inactive calendar/status markers. |
 
-**Base unit:** 4px
+Do not introduce blue, green, red, purple, gradients, or decorative color coding. Completion, warning, and deletion states must communicate through wording, shape, borders, and the single accent—not a second color system.
 
-**Density:** comfortable
+### Typography
 
-### Spacing Scale
+- Use `Lausanne` when installed; otherwise use `Inter`, `IBM Plex Sans`, then the system sans-serif stack.
+- Use only a 400 weight. Establish hierarchy with scale, line-height, case, and tracking instead of boldness.
+- Enable `font-feature-settings: "ss01"` globally.
+- A view has one page title at 32–40px / 1.0. Do not add display-style headings inside panels.
+- Eyebrows, navigation labels, legends, status labels, and metric captions use 10px uppercase text with `0.05em` tracking and generous line-height.
+- Panel labels, helper copy, and card names use body/subheading scale rather than additional heading levels.
+- Keep page titles and body copy left aligned. Numbers can align right inside metric blocks where comparison benefits from it.
 
-| Name | Value | Token |
-|------|-------|-------|
-| 4 | 4px | `--spacing-4` |
-| 8 | 8px | `--spacing-8` |
-| 12 | 12px | `--spacing-12` |
-| 16 | 16px | `--spacing-16` |
-| 20 | 20px | `--spacing-20` |
-| 24 | 24px | `--spacing-24` |
-| 32 | 32px | `--spacing-32` |
-| 40 | 40px | `--spacing-40` |
-| 48 | 48px | `--spacing-48` |
-| 64 | 64px | `--spacing-64` |
-| 128 | 128px | `--spacing-128` |
-| 156 | 156px | `--spacing-156` |
+### Space, shape, and elevation
 
-### Border Radius
+- Use a 4px base rhythm: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, and 128px.
+- On desktop, reserve a 248px dark navigation rail and constrain workspace content to about 1244px. On smaller screens, convert that rail into a sticky horizontal app nav.
+- Use 16–20px padding inside working cards and 8–16px gaps inside small control groups. Major workspace spacing is 24–36px, not landing-page scale.
+- Radii are fixed: 6px buttons/tags, 10px inputs, 12px quiet wash panels, and 16px content cards. Do not use pill shapes or arbitrary radii.
+- Elevation comes from a `1px` hairline border and a surface change—never from a drop shadow. The sticky header may use only a faint white inset highlight.
 
-| Element | Value |
-|---------|-------|
-| tags | 6px |
-| cards | 16px |
-| inputs | 10px |
-| buttons | 6px |
+## Layout rules
 
-### Shadows
+1. The application shell owns navigation. Use a sticky Obsidian sidebar with a compact profile block on desktop; switch it to a sticky horizontal nav on smaller screens.
+2. A slim top bar shows the current date and workspace/account state.
+3. Directly below the top bar, keep a sticky status strip visible with exactly three user-facing facts: current work, current status, and next action. Its action button takes the user back to their habit list or input.
+4. Each view has one page title only: `Today`, `Calendar`, `Insights`, or `Data`. The title describes the current task; panel content uses labels and helper text, not additional page headings.
+5. Working content starts immediately after the page header. Use concise cards, clear form labels, and a compact vertical rhythm rather than a hero, ticker, or campaign-style section.
+6. Keep desktop content left aligned in the workspace. Do not center text merely for decoration.
 
-| Name | Value | Token |
-|------|-------|-------|
-| subtle | `rgba(255, 255, 255, 0.6) 0px 0px 2px 0px inset` | `--shadow-subtle` |
+## Component rules
 
-### Layout
+### Buttons and controls
 
-- **Page max-width:** 1200px
-- **Section gap:** 64-128px
-- **Card padding:** 20-24px
-- **Element gap:** 8px
+- **Primary button:** highlighter-yellow fill, ink text, 6px radius, approximately 44px tall. Use for “Add habit” and the single most prominent action in a group.
+- **Outlined button:** paper fill, 1px ink border, ink text, 6px radius. Use for navigation controls, import, save, and destructive actions when context makes their purpose explicit.
+- **Quiet button:** transparent with no border. On hover, use a Bone fill. Use for edit/delete and secondary actions.
+- **Icon button:** 40px square, hairline bordered or Bone surface, 10px radius. Always include an accessible label.
+- All controls use color/background/border transitions of 200–400ms; no scale, bounce, or glow effects.
 
-## Components
+### Application shell and status
 
-### Primary Button (Highlighter)
-**Role:** Main CTA — 'Get started for free', 'Create report', 'See a demo'
+- Navigation labels should be plain-language task destinations: Today, Calendar, Insights, and Data. Include a small index only as a supporting orientation cue.
+- The active destination uses the highlighter-yellow fill. Inactive navigation stays Obsidian/Paper with no competing accent.
+- The status strip is a working control, not a marketing metric: show `Current work`, `Status`, and `Next action` in that order, plus one direct action button.
+- Use a compact local-profile treatment to make the workspace feel personal without inventing an authentication flow or hiding local-first behavior.
+- The user must be able to return to their current habit list or input from every view in one action.
 
-6px radius, #e4f222 fill, #0c0a08 text, no border, 0px vertical padding with 20px horizontal padding (text-aligned height ~44px). The only chromatic button in the system; its chartreuse fill is the highest-contrast pair against Ink text (17:1).
+### Forms
 
-### Outlined Button
-**Role:** Secondary CTA — 'Switch in days', 'Explore Ramp Intelligence'
+- Inputs are white, 1px hairline-bordered, 10px radius, and use 16px body text.
+- Labels use the uppercase caption treatment. Supporting text is Ash.
+- On focus, swap the border to Ink and add an unobtrusive 2px Bone outline. Do not use colored focus rings.
 
-6px radius, transparent fill, 1px Ink border, Ink text, 0px vertical / 12px horizontal padding. Used when a second action sits beside the primary without competing for attention.
+### Habit cards
 
-### Ghost / Link Button
-**Role:** Tertiary action — nav items, 'Read the report', inline links
+- Present each habit in a white 16px-radius card with a hairline border, not a shadow.
+- The completion trigger is a compact square control, not a circular badge. A completed card may use the highlighter fill on the control and a highlighter edge/inset to state completion.
+- Streaks, milestones, and descriptions remain ink/ash text. Avoid multicolored achievement badges.
+- Edit mode uses the same fields and buttons as creation mode so it reads as an inline desk edit.
 
-Transparent fill, no border, Ink text, 6px radius. Hover state transitions to #f4f2f0 background.
+### Progress, calendar, and analytics
 
-### Square Icon Button
-**Role:** Compact action — '+ New dashboard', utility toggles
+- Progress uses a Bone track and one highlighter-yellow bar. The percentage is a large editorial number, not a colorful gauge.
+- Calendar days use hairline/smoke structural cues. Full days use a highlighter square, partial days use Ink, and empty days use Smoke. The current date uses an Ink border.
+- Metric cards use typography and borders for contrast. At most one live metric may use a highlighter surface.
+- Charts are monochrome Ink bars with the current day highlighted in yellow.
 
-16px padding all sides, #f4f2f0 fill, 12px radius, Ink icon/text. Squarer feel than standard CTA; used for inline dashboard controls.
+### Data management
 
-### Content Card
-**Role:** Primary card surface for testimonials, feature blocks, logo grids
+- Treat export as the primary data action, import as outlined, and clear as quiet/outlined. Do not use red as a destructive shortcut.
+- Surface import/export results as concise inline status text, rather than decorative alerts when possible.
 
-16px radius, #ffffff fill, 1px #e5e7eb border, no shadow, 20px padding. Border replaces shadow as the elevation primitive — 17 of these are the dominant card type.
-
-### Wash Card
-**Role:** Subtle feature or stat card
-
-12px radius, #f4f2f0 fill, no border, 1px padding wrapper creates a hairline gap before content. Used for muted callouts that don't need white contrast.
-
-### Email Input
-**Role:** Hero email capture, form fields
-
-10px radius, transparent fill, 1px rgba(33,33,33,0.1) border, #0c0a08 text, 24px left padding / 16px right padding. Sits flush beside the Primary Button to form a composite CTA.
-
-### Testimonial Card
-**Role:** Customer quote with avatar and attribution
-
-16px radius, #ffffff fill, 1px #e5e7eb border, 20px padding, contains company logo badge (square), name + title in 16px lausanne 400, quote in #0c0a08 body. Arranged in horizontal scroll rows.
-
-### Live Counter Ticker
-**Role:** Scrolling metric strip ('Agents at work today', 'Expenses reviewed')
-
-Full-width #1a1919 dark band, uppercase 10px lausanne labels in Ash (#6d6c6b), metric values in Paper (#ffffff) at 14px. Numbers pulse subtly via opacity transitions.
-
-### Sticky Navigation Bar
-**Role:** Primary site navigation
-
-102px total height including 40px announcement bar above. #ffffff fill, 1px bottom border, 15 interactive elements (logo, Products, Partners, Solutions, Resources, Customers, Pricing, Sign in, See a demo). Frosted-glass inset shadow rgba(255,255,255,0.6) inset 0 0 2px adds subtle top highlight.
-
-### Announcement Bar
-**Role:** Top-of-page promotional strip
-
-40px height, #ffffff fill, 13px centered lausanne body text with inline link 'Learn more'. Dismissible with close icon. Sits above the main nav.
-
-### Hero Product Screenshot
-**Role:** Dashboard / product visual in hero and feature sections
-
-Rounded browser-chrome frame with traffic-light dots, floating UI panels with shadow-free white fills. Contains inline Highlighter Yellow CTA buttons to bridge product-as-marketing.
-
-### Logo Grid Cell
-**Role:** Customer logo display in social-proof block
-
-Transparent fill, 1px #e5e7eb grid borders forming cells, centered grayscale logo. 7-column layout; last cell replaced with a dark '7 mo' Pullquote card to break the grid rhythm.
-
-## Do's and Don'ts
-
-### Do
-- Use lausanne at weight 400 exclusively — never introduce a bold or semibold variant; hierarchy comes from size and tracking.
-- Use #e4f222 only for primary action fills, live counters, and active states — never as a background wash or decorative accent.
-- Express card elevation with 1px #e5e7eb borders on #ffffff fills — avoid box-shadow except for the nav's inset white highlight.
-- Set display headlines at 64px / 48px / 40px with line-height ≤ 1.05 to maintain the editorial typographic voice.
-- Apply 0.018em positive letter-spacing on 10px uppercase micro-labels and metric captions.
-- Use 6px radius for buttons and tags, 10px for inputs, 12px for wash cards, and 16px for content cards.
-- Include "ss01" in font-feature-settings on every lausanne declaration to preserve the typeface's editorial character.
-
-### Don't
-- Don't introduce additional chromatic accent colors — the system's power depends on a single highlighter-yellow signal against monochrome.
-- Don't use bold or semibold font weights — lausanne 400 at larger sizes carries all heading hierarchy.
-- Don't apply box-shadow to content cards, modals, or panels — use 1px #e5e7eb borders instead.
-- Don't use #0c0a08 as a background fill for large sections — reserve it for text; use #1a1919 for inverted panels.
-- Don't center body text or headlines — Ramp's layout is consistently left-aligned within centered max-width containers.
-- Don't add decorative gradients, illustrations, or stock photography — the visual language is typography, product screenshots, and grayscale logos only.
-- Don't use radii outside the system: 6 / 10 / 12 / 16px — never 4px or fully rounded pill shapes on UI elements.
-
-## Surfaces
-
-| Level | Name | Value | Purpose |
-|-------|------|-------|---------|
-| 1 | Canvas | `#f4f2f0` | Page background — warm off-white sets a paper-like editorial feel |
-| 2 | Card | `#ffffff` | Standard card and content surface — pure white lifts above the Bone canvas |
-| 3 | Wash | `#f4f2f0` | Subtle secondary surface, link hover backgrounds, feature callouts |
-| 4 | Inverted | `#1a1919` | Dark panels, sticky nav, footer, hero inversion blocks |
-| 5 | Action | `#e4f222` | Accent surface for active states, live counters, high-emphasis fills |
-
-## Elevation
-
-Elevation is expressed entirely through hairline 1px borders (#e5e7eb) and surface tonal shifts (Bone → White → Inverted) rather than shadows. The one detected box-shadow is an inset white highlight on the sticky nav — a frosted-glass cue rather than a drop shadow. This deliberate flatness keeps the editorial feel intact and prevents visual noise on dense marketing surfaces.
-
-## Imagery
-
-Photography and lifestyle imagery are absent. The visual language is dominated by product screenshots (floating browser-chrome UI frames showing Ramp dashboards), grayscale customer logos in grid cells, and one full-bleed dark product image (a pink neon 'Stay Posted' installation) as a brand-moment card. Iconography is filled, mono-colored, and minimal — small flat UI glyphs rather than illustrated characters. Everything reads as a screenshot or a typographic statement; no decorative illustration, no stock photography, no human faces outside of testimonial avatar squares. The density is text-dominant with product UI visuals carrying the visual weight.
-
-## Layout
-
-Full-bleed light canvas with max-width ~1200px centered content columns. Hero is a left-aligned typographic statement (64px headline + 24px sub + composite input+button) over a large product screenshot that bleeds to the right edge. Section rhythm alternates between light editorial bands (Bone canvas, 64–128px vertical padding) and one full-bleed dark band (#1a1919 Live Counter strip). Content arrangement is consistently left-aligned within centered max-width containers; feature blocks use 2-column text-left/visual-right pairs. Grid usage: a 7-column logo grid (customer names), a 4-column testimonial scroll grid, and stacked metric strips. Navigation is a sticky top bar (white, hairline-bordered, with a 40px announcement strip above it). The overall feel is editorial-publication: generous whitespace, tight typographic columns, and rhythmic full-bleed interruptions rather than modular card grids.
-
-## Agent Prompt Guide
-
-Quick Color Reference:
-- text: #0c0a08
-- background: #f4f2f0
-- card surface: #ffffff
-- border: #e5e7eb
-- muted text: #6d6c6b
-- primary action: #e4f222 (filled action)
-
-3-5 Example Component Prompts:
-1. Hero headline: 64px lausanne weight 400, #0c0a08, line-height 1.0, on #f4f2f0 canvas. Subhead at 24px lausanne weight 400, #6d6c6b. Composite CTA: email input (#ffffff, 10px radius, 1px rgba(33,33,33,0.1) border, 24px left padding) flush beside a Primary Button (#e4f222 fill, #0c0a08 text, 6px radius, 20px horizontal padding).
-2. Content card: #ffffff fill, 1px #e5e7eb border, 16px radius, 20px padding. 16px lausanne 400 #0c0a08 body text. No shadow — border does the elevation work.
-3. Sticky nav: #ffffff fill, 1px #e5e7eb bottom border, 102px total height (40px announcement strip + 62px nav row). Logo left, centered nav links, Sign in + Highlighter Yellow 'See a demo' button right.
-4. Live Counter strip: full-bleed #1a1919 band, uppercase 10px lausanne #6d6c6b labels, #ffffff metric values at 14px. Horizontally scrolling ticker.
-5. Outlined Button: transparent fill, 1px #0c0a08 border, #0c0a08 text, 6px radius, 0px vertical / 12px horizontal padding.
-
-## Signature Design Choices
-
-1. Single-weight typography: lausanne at 400 only — hierarchy comes from size and tracking, not bold. Headlines at 64px with line-height 1.0 feel like editorial pull-quotes, not SaaS headers.
-2. One chromatic accent rule: #e4f222 appears only on action surfaces. The page is otherwise a study in warm neutrals (Bone, Ink, Ash). This makes every chartreuse element register as 'money moving'.
-3. Hairline borders over shadows: cards use 1px #e5e7eb outlines instead of box-shadow. The single detected shadow is an inset white highlight on the nav — a frosted edge, not a drop shadow.
-4. Negative tracking on display, positive on caption: 64px headlines sit tight (lh 1.0), while 10px uppercase labels open up (ls 0.018em). The contrast between tight display and airy micro-labels defines the system's voice.
-5. Font feature 'ss01': lausanne ships with stylistic set 01 enabled — likely alternate g/t shapes that give the typeface its editorial character. Always include in CSS.
-
-## Motion Philosophy
-
-Motion is utility-focused and moderate: 0.3–0.4s durations with ease-out timing. Transitions target color, background-color, border-color, fill, and stroke — not transform or opacity theatrics. The system avoids animation as ornament; motion signals state change (hover fills, link underlines, counter increments). Backdrop blurs (25px, 12px, 8px) appear on overlays and the sticky nav for a frosted-glass cue.
-
-## Similar Brands
-
-- **Linear** — Same monochrome-first UI philosophy with a single vivid accent color (Linear's violet) reserved exclusively for action surfaces, and near-identical hairline-border card approach over shadows.
-- **Stripe** — Editorial-grade typography, tight display leading, generous whitespace, and a restrained palette where one accent color carries the brand's visual energy.
-- **Notion** — Warm off-white canvas with ink-black text, single-weight sans-serif feel, and a flat component vocabulary that avoids heavy shadows or gradients.
-- **Substack** — Publication-leaning layout with oversized tight-leading headlines, warm neutrals, and a deliberate flatness that reads as editorial rather than product UI.
-- **Brex** — Direct fintech competitor sharing the same high-contrast monochrome base with one neon accent for CTAs and the same hairline-border card grammar.
-
-## Quick Start
-
-### CSS Custom Properties
-
-```css
-:root {
-  /* Colors */
-  --color-highlighter-yellow: #e4f222;
-  --color-ink: #0c0a08;
-  --color-obsidian: #1a1919;
-  --color-paper: #ffffff;
-  --color-bone: #f4f2f0;
-  --color-ash: #6d6c6b;
-  --color-hairline: #e5e7eb;
-  --color-smoke: #d3d3d3;
-
-  /* Typography — Font Families */
-  --font-lausanne: 'lausanne', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
-  /* Typography — Scale */
-  --text-caption: 10px;
-  --leading-caption: 2.2;
-  --tracking-caption: 0.18px;
-  --text-body: 16px;
-  --leading-body: 1.5;
-  --text-subheading: 20px;
-  --leading-subheading: 1.3;
-  --text-heading-sm: 24px;
-  --leading-heading-sm: 1.17;
-  --text-heading: 28px;
-  --leading-heading: 1.14;
-  --text-heading-lg: 40px;
-  --leading-heading-lg: 1.05;
-  --text-display: 64px;
-  --leading-display: 1;
-
-  /* Typography — Weights */
-  --font-weight-regular: 400;
-
-  /* Spacing */
-  --spacing-unit: 4px;
-  --spacing-4: 4px;
-  --spacing-8: 8px;
-  --spacing-12: 12px;
-  --spacing-16: 16px;
-  --spacing-20: 20px;
-  --spacing-24: 24px;
-  --spacing-32: 32px;
-  --spacing-40: 40px;
-  --spacing-48: 48px;
-  --spacing-64: 64px;
-  --spacing-128: 128px;
-  --spacing-156: 156px;
-
-  /* Layout */
-  --page-max-width: 1200px;
-  --section-gap: 64-128px;
-  --card-padding: 20-24px;
-  --element-gap: 8px;
-
-  /* Border Radius */
-  --radius-md: 6px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-
-  /* Named Radii */
-  --radius-tags: 6px;
-  --radius-cards: 16px;
-  --radius-inputs: 10px;
-  --radius-buttons: 6px;
-
-  /* Shadows */
-  --shadow-subtle: rgba(255, 255, 255, 0.6) 0px 0px 2px 0px inset;
-
-  /* Surfaces */
-  --surface-canvas: #f4f2f0;
-  --surface-card: #ffffff;
-  --surface-wash: #f4f2f0;
-  --surface-inverted: #1a1919;
-  --surface-action: #e4f222;
-}
-```
-
-### Tailwind v4
-
-```css
-@theme {
-  /* Colors */
-  --color-highlighter-yellow: #e4f222;
-  --color-ink: #0c0a08;
-  --color-obsidian: #1a1919;
-  --color-paper: #ffffff;
-  --color-bone: #f4f2f0;
-  --color-ash: #6d6c6b;
-  --color-hairline: #e5e7eb;
-  --color-smoke: #d3d3d3;
-
-  /* Typography */
-  --font-lausanne: 'lausanne', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
-  /* Typography — Scale */
-  --text-caption: 10px;
-  --leading-caption: 2.2;
-  --tracking-caption: 0.18px;
-  --text-body: 16px;
-  --leading-body: 1.5;
-  --text-subheading: 20px;
-  --leading-subheading: 1.3;
-  --text-heading-sm: 24px;
-  --leading-heading-sm: 1.17;
-  --text-heading: 28px;
-  --leading-heading: 1.14;
-  --text-heading-lg: 40px;
-  --leading-heading-lg: 1.05;
-  --text-display: 64px;
-  --leading-display: 1;
-
-  /* Spacing */
-  --spacing-4: 4px;
-  --spacing-8: 8px;
-  --spacing-12: 12px;
-  --spacing-16: 16px;
-  --spacing-20: 20px;
-  --spacing-24: 24px;
-  --spacing-32: 32px;
-  --spacing-40: 40px;
-  --spacing-48: 48px;
-  --spacing-64: 64px;
-  --spacing-128: 128px;
-  --spacing-156: 156px;
-
-  /* Border Radius */
-  --radius-md: 6px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-
-  /* Shadows */
-  --shadow-subtle: rgba(255, 255, 255, 0.6) 0px 0px 2px 0px inset;
-}
-```
+### Accountability Sprint
+
+- Place `Sprint` ahead of daily habits in app navigation. It is a working space for a fixed four-week commitment, not a marketing landing page.
+- Before a sprint exists, use one concise setup card: goal, coach name, start date, and up to three Week 1 commitments with a definition of done.
+- Once active, keep the sprint goal, week number, date range, coach name, and check-in record visible in compact cards.
+- A daily check-in uses three textual states only—Complete, Partial, Blocked—plus optional commitment selection and a short note. Do not add celebratory animation or multi-color status badges.
+- Participant and coach views share the same record. The role switch is a compact segmented control; the coach view prioritizes today’s status, review state, a concise weekly review form, and recent check-ins.
+- Coach feedback is a plain white or Bone card with one explicit “Next week” instruction. It should read as useful guidance, not social feed content.
+- Include sprint data in local backups alongside habits and completion history.
+
+## Responsive behavior
+
+- **Desktop (≥ 821px):** show the sticky left app rail, sticky date header, and sticky current-work strip. Keep the habit form in two fields plus one action; metrics can sit in up to four columns.
+- **Tablet (621–820px):** turn the sidebar into a horizontal sticky app nav. Keep the current-work strip beneath it and allow the form to use two fields before stacking its action.
+- **Mobile (≤ 620px):** retain sticky navigation and the current-work strip, but stack its next action below current work/status. Use 16px workspace gutters; stack form fields, cards, data actions, and metrics. Calendar cells remain seven columns with reduced padding.
+- Preserve minimum 40–44px target sizes for controls and keep keyboard focus visible at every breakpoint.
+
+## Do
+
+- Let typography, whitespace, and hairline structure carry the visual hierarchy.
+- Reserve highlighter yellow for action, active state, and live progress.
+- Use concise uppercase micro-labels to establish the editorial voice.
+- Keep current work, status, and next action available while the user is in any view.
+- Use exactly one page title per active view; use labels and supporting copy inside cards.
+- Treat a coach review and a participant check-in as small, focused forms—not as chat, posts, or a public community surface.
+- Prefer flat white cards on the warm Bone canvas.
+- Use motion only to clarify a value, focus, hover, or selection change.
+- Keep semantics intact: buttons remain buttons, inputs retain labels, and live status has accessible text.
+
+## Do not
+
+- Do not use gradients, colorful status systems, shadows, glow effects, or bouncy/scaling hover animation.
+- Do not add a second accent color, stock imagery, decorative illustrations, or large emoji as primary UI decoration.
+- Do not use bold/semibold type to create hierarchy.
+- Do not use a hero section, promotional slogan, live ticker, campaign metric, or repeated page heading inside the application.
+- Do not center page titles or paragraphs.
+- Do not imply real coach matching, payments, or account identity in a local-only prototype; keep those future capabilities visibly out of the MVP interaction model.
+- Do not use pill controls, fully round completion badges, or radii outside 6/10/12/16px.
+- Do not remove, disguise, or make inaccessible existing habit, calendar, statistics, export, import, or clear-data functionality during the redesign.

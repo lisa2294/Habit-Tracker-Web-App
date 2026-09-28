@@ -5,41 +5,36 @@ function ProgressBar({ completed, total }) {
   const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setAnimatedPercentage(percentage), 100);
-    return () => window.clearTimeout(timer);
+    const timer = setTimeout(() => setAnimatedPercentage(percentage), 100);
+    return () => clearTimeout(timer);
   }, [percentage]);
 
   return (
-    <section className="panel progress-panel" aria-labelledby="progress-title">
-      <div className="panel-heading">
-        <h2 id="progress-title">Today&apos;s progress</h2>
-      </div>
-
-      <div className="progress-readout">
-        <output>{String(percentage).padStart(2, '0')}%</output>
-        <p>
-          <strong>{completed}</strong> complete<br />
-          <span>{total} scheduled</span>
-        </p>
+    <section className="progress-card" aria-label="Today’s habit progress">
+      <div className="compact-panel-header">
+        <div>
+          <p className="eyebrow">TODAY’S STATUS</p>
+          <p className="compact-panel-title">{completed} of {total} habits completed</p>
+        </div>
+        <output className="progress-number" aria-label={`${percentage} percent complete`}>
+          {percentage}%
+        </output>
       </div>
 
       <div
         className="progress-track"
         role="progressbar"
-        aria-label="Daily habit completion"
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow={percentage}
+        aria-label="Today’s habit completion progress"
       >
         <div className="progress-fill" style={{ width: `${animatedPercentage}%` }} />
       </div>
 
-      <div className="progress-scale" aria-hidden="true">
-        <span>00</span>
-        <span>25</span>
-        <span>50</span>
-        <span>75</span>
-        <span>100</span>
+      <div className="progress-card__footer">
+        <p>{total === 0 ? 'Add a habit to start today’s list.' : `${total - completed} remaining today.`}</p>
+        <p>{percentage === 100 && total > 0 ? 'All set for today.' : 'Update each habit as you go.'}</p>
       </div>
     </section>
   );

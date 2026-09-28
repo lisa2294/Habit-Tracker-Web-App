@@ -14,43 +14,43 @@ function AddHabitForm({ onAddHabit }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="panel add-habit-panel">
-      <div className="panel-heading">
-        <h2>Add habit</h2>
+    <section className="content-card habit-form" aria-label="Add a habit">
+      <div className="panel-meta">
+        <p className="eyebrow">ADD A HABIT</p>
+        <p className="panel-meta__note">Create the next item in your daily list.</p>
       </div>
 
-      <div className="form-stack">
-        <div className="field-group">
-          <label htmlFor="name">HABIT NAME</label>
+      <form onSubmit={handleSubmit} className="habit-form__fields">
+        <label className="field">
+          <span>HABIT NAME</span>
           <input
             type="text"
             id="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Read for twenty minutes"
-            autoComplete="off"
+            className="field-input"
+            placeholder="Drink water, move for 30 minutes…"
             required
           />
-        </div>
+        </label>
 
-        <div className="field-group">
-          <label htmlFor="description">NOTE <span>/ OPTIONAL</span></label>
+        <label className="field">
+          <span>NOTE · OPTIONAL</span>
           <input
             type="text"
             id="description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="After dinner, before screens"
-            autoComplete="off"
+            className="field-input"
+            placeholder="What counts as done?"
           />
-        </div>
+        </label>
 
-        <button type="submit" className="primary-button">
-          Create habit
-          <span aria-hidden="true">→</span>
+        <button type="submit" className="button button-primary habit-form__submit">
+          Add habit
         </button>
-      </div>
-    </form>
+      </form>
+    </section>
   );
 }
 

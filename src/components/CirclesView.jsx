@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { currentUserId, pilotCoaches } from '../data/circles';
+import '../circles.css';
 
 const sectionTabs = [
   { id: 'overview', label: 'Overview' },

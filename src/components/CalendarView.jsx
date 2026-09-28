@@ -5,6 +5,8 @@ const monthNames = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
+const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 function CalendarView({ completions, habits }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -23,7 +25,7 @@ function CalendarView({ completions, habits }) {
   };
 
   const getCompletionStatus = (date) => {
-    if (!date) return null;
+    if (!date || habits.length === 0) return 'none';
 
     const dateString = date.toISOString().split('T')[0];
     const completedHabits = habits.filter((habit) => (
@@ -43,23 +45,45 @@ function CalendarView({ completions, habits }) {
     });
   };
 
+  const goToToday = () => setCurrentDate(new Date());
   const days = getDaysInMonth(currentDate);
 
   return (
-    <section className="panel calendar-panel" aria-labelledby="calendar-title">
-      <div className="calendar-header">
-        <h2 id="calendar-title">{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</h2>
-
-        <div className="calendar-controls">
-          <button type="button" onClick={() => navigateMonth(-1)} className="square-button" aria-label="Previous month">←</button>
-          <button type="button" onClick={() => setCurrentDate(new Date())} className="ghost-button compact">Today</button>
-          <button type="button" onClick={() => navigateMonth(1)} className="square-button" aria-label="Next month">→</button>
+    <section className="content-card calendar-panel" aria-label="Completion calendar">
+      <div className="calendar-panel__toolbar">
+        <div className="panel-meta">
+          <p className="eyebrow">MONTH VIEW</p>
+          <p className="panel-meta__note">Each marker records the habits completed that day.</p>
+        </div>
+        <div className="calendar-controls" aria-label="Calendar controls">
+          <button
+            type="button"
+            onClick={() => navigateMonth(-1)}
+            className="icon-button"
+            aria-label="Previous month"
+          >
+            ←
+          </button>
+          <button type="button" onClick={goToToday} className="button button-primary button-small">Today</button>
+          <button
+            type="button"
+            onClick={() => navigateMonth(1)}
+            className="icon-button"
+            aria-label="Next month"
+          >
+            →
+          </button>
         </div>
       </div>
 
-      <div className="calendar-grid">
-        {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day) => (
-          <div key={day} className="weekday">{day}</div>
+      <div className="calendar-month">
+        <p className="eyebrow">SELECTED MONTH</p>
+        <p>{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</p>
+      </div>
+
+      <div className="calendar-grid" role="grid" aria-label={`${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()} completion calendar`}>
+        {weekDays.map((day) => (
+          <div key={day} className="calendar-weekday" role="columnheader">{day}</div>
         ))}
 
         {days.map((date, index) => {
@@ -69,13 +93,14 @@ function CalendarView({ completions, habits }) {
           return (
             <div
               key={date ? date.toISOString() : `empty-${index}`}
-              className={`calendar-day ${date ? '' : 'is-empty'} ${isToday ? 'is-today' : ''}`}
-              aria-label={date ? `${date.toDateString()}, ${status} completion` : undefined}
+              className={`calendar-day ${date ? `is-${status}` : 'is-empty'} ${isToday ? 'is-today' : ''}`}
+              role={date ? 'gridcell' : undefined}
+              aria-label={date ? `${date.toDateString()}: ${status} completion` : undefined}
             >
               {date && (
                 <>
-                  <span className="day-number">{String(date.getDate()).padStart(2, '0')}</span>
-                  <span className={`calendar-status status-${status}`} aria-hidden="true" />
+                  <span>{date.getDate()}</span>
+                  <i className="calendar-status-marker" aria-hidden="true" />
                 </>
               )}
             </div>
@@ -83,10 +108,10 @@ function CalendarView({ completions, habits }) {
         })}
       </div>
 
-      <div className="calendar-legend">
-        <div><span className="calendar-status status-full" />All complete</div>
-        <div><span className="calendar-status status-partial" />In progress</div>
-        <div><span className="calendar-status status-none" />No activity</div>
+      <div className="calendar-legend" aria-label="Completion legend">
+        <span><i className="calendar-status-marker is-full" aria-hidden="true" />All complete</span>
+        <span><i className="calendar-status-marker is-partial" aria-hidden="true" />Some complete</span>
+        <span><i className="calendar-status-marker is-none" aria-hidden="true" />No completion</span>
       </div>
     </section>
   );

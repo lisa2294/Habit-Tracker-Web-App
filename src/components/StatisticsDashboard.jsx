@@ -1,21 +1,23 @@
+function getDateKey(date) {
+  return date.toISOString().split('T')[0];
+}
+
 function StatisticsDashboard({ habits, completions }) {
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
-  const todayString = today.toISOString().split('T')[0];
-
+  const todayKey = getDateKey(today);
   const totalHabits = habits.length;
-  const activeHabits = habits.filter((habit) => (
-    completions[habit.id] || []
-  ).length > 0).length;
+
+  const activeHabits = habits.filter((habit) => (completions[habit.id] || []).length > 0).length;
 
   const currentStreaks = habits.map((habit) => {
     const habitCompletions = completions[habit.id] || [];
-    if (!habitCompletions.includes(todayString)) return 0;
+    if (!habitCompletions.includes(todayKey)) return 0;
 
     let streak = 0;
     const date = new Date(today);
-    while (habitCompletions.includes(date.toISOString().split('T')[0])) {
+    while (habitCompletions.includes(getDateKey(date))) {
       streak += 1;
       date.setDate(date.getDate() - 1);
     }
@@ -24,107 +26,115 @@ function StatisticsDashboard({ habits, completions }) {
 
   const longestCurrentStreak = Math.max(...currentStreaks, 0);
   const daysElapsed = today.getDate();
-  const monthlyCompletions = [];
-
-  for (let day = 1; day <= daysElapsed; day += 1) {
-    const date = new Date(currentYear, currentMonth, day);
-    const dateString = date.toISOString().split('T')[0];
-    const completed = habits.filter((habit) => (
-      completions[habit.id] || []
-    ).includes(dateString)).length;
-    monthlyCompletions.push(completed);
-  }
-
-  const averageMonthlyCompletion = monthlyCompletions.reduce((sum, value) => sum + value, 0) / daysElapsed;
-  const monthlyCompletionRate = totalHabits
-    ? Math.round((averageMonthlyCompletion / totalHabits) * 100)
-    : 0;
+  const monthlyCompletions = Array.from({ length: daysElapsed }, (_, index) => {
+    const date = new Date(currentYear, currentMonth, index + 1);
+    const dateKey = getDateKey(date);
+    return habits.filter((habit) => (completions[habit.id] || []).includes(dateKey)).length;
+  });
+  const avgMonthlyCompletion = monthlyCompletions.reduce((sum, total) => sum + total, 0) / daysElapsed;
+  const monthlyCompletionRate = totalHabits > 0 ? Math.round((avgMonthlyCompletion / totalHabits) * 100) : 0;
 
   const habitStats = habits.map((habit) => {
     const habitCompletions = completions[habit.id] || [];
-    const daysActive = Math.max(
-      1,
-      Math.ceil((today - new Date(habit.createdAt)) / (1000 * 60 * 60 * 24)),
-    );
+    const createdAt = new Date(habit.createdAt);
+    const trackedDays = Math.max(1, Math.floor((today - createdAt) / (1000 * 60 * 60 * 24)) + 1);
+    const completionRate = Math.min(100, Math.round((habitCompletions.length / trackedDays) * 100));
 
     return {
       ...habit,
       completionCount: habitCompletions.length,
-      completionRate: Math.min(100, Math.round((habitCompletions.length / daysActive) * 100)),
+      completionRate,
     };
-  }).sort((a, b) => b.completionRate - a.completionRate);
+  }).sort((firstHabit, secondHabit) => secondHabit.completionRate - firstHabit.completionRate);
 
-  const topHabits = habitStats.slice(0, 3);
-  const recentCompletions = monthlyCompletions.slice(-14);
-  const firstChartDay = daysElapsed - recentCompletions.length + 1;
+  const recentActivity = Array.from({ length: 14 }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - 13 + index);
+    const dateKey = getDateKey(date);
+    const completed = habits.filter((habit) => (completions[habit.id] || []).includes(dateKey)).length;
 
-  const metrics = [
-    { label: 'Total habits', value: String(totalHabits).padStart(2, '0') },
-    { label: 'Active habits', value: String(activeHabits).padStart(2, '0') },
-    { label: 'Longest streak', value: `${String(longestCurrentStreak).padStart(2, '0')}D` },
-    { label: 'Monthly average', value: `${String(monthlyCompletionRate).padStart(2, '0')}%`, inverted: true },
-  ];
+    return { date, completed, isToday: index === 13 };
+  });
 
   return (
-    <section className="statistics-section" aria-label="Habit insights">
-      <div className="metric-grid">
-        {metrics.map((metric) => (
-          <article key={metric.label} className={`metric-card ${metric.inverted ? 'is-inverted' : ''}`}>
-            <strong>{metric.value}</strong>
-            <p>{metric.label}</p>
-          </article>
-        ))}
+    <section className="statistics-panel" aria-label="Habit statistics">
+      <div className="panel-meta statistics-panel__meta">
+        <p className="eyebrow">MONTH TO DATE</p>
+        <p className="panel-meta__note">{today.toLocaleString('en-US', { month: 'long' })} activity so far.</p>
+      </div>
+
+      <div className="metrics-grid" aria-label="Habit statistics">
+        <article className="metric-card">
+          <p>TOTAL HABITS</p>
+          <strong>{totalHabits}</strong>
+          <span>in your list</span>
+        </article>
+        <article className="metric-card">
+          <p>ACTIVE HABITS</p>
+          <strong>{activeHabits}</strong>
+          <span>with a check-in</span>
+        </article>
+        <article className="metric-card">
+          <p>LONGEST STREAK</p>
+          <strong>{longestCurrentStreak}</strong>
+          <span>days in sequence</span>
+        </article>
+        <article className="metric-card metric-card--accent">
+          <p>MONTHLY AVERAGE</p>
+          <strong>{monthlyCompletionRate}%</strong>
+          <span>completed so far</span>
+        </article>
       </div>
 
       <div className="statistics-grid">
-        <article className="panel ranking-panel">
-          <div className="panel-heading compact-heading">
-            <h3>Top habits</h3>
-            <span className="panel-index">Top 3</span>
+        <section className="content-card ranking-panel" aria-label="Top habits">
+          <div className="panel-meta">
+            <p className="eyebrow">CONSISTENCY RANKING</p>
+            <p className="panel-meta__note">Habits with the strongest completion rate.</p>
           </div>
 
-          {topHabits.length > 0 ? (
+          {habitStats.length > 0 ? (
             <ol className="ranking-list">
-              {topHabits.map((habit, index) => (
+              {habitStats.slice(0, 3).map((habit, index) => (
                 <li key={habit.id}>
-                  <span className="rank-number">{String(index + 1).padStart(2, '0')}</span>
-                  <div>
+                  <span className="ranking-list__rank">0{index + 1}</span>
+                  <span className="ranking-list__icon" aria-hidden="true">{habit.icon || '·'}</span>
+                  <span className="ranking-list__habit">
                     <strong>{habit.name}</strong>
-                    <span>{habit.completionCount} completions</span>
-                  </div>
-                  <output>{habit.completionRate}%</output>
+                    <small>{habit.completionCount} entries recorded</small>
+                  </span>
+                  <span className="ranking-list__rate">{habit.completionRate}%</span>
                 </li>
               ))}
             </ol>
           ) : (
-            <p className="panel-empty">Complete a habit to establish a ranking.</p>
+            <p className="empty-copy">Add habits and check them off to build your ranking.</p>
           )}
-        </article>
+        </section>
 
-        <article className="panel chart-panel">
-          <div className="panel-heading compact-heading">
-            <h3>Last 14 days</h3>
-            <span className="panel-index">Avg {monthlyCompletionRate}%</span>
+        <section className="content-card activity-panel" aria-label="Recent activity">
+          <div className="panel-meta">
+            <p className="eyebrow">RECENT ACTIVITY</p>
+            <p className="panel-meta__note">Completion count for the last 14 days.</p>
           </div>
-
-          <div className="bar-chart" aria-label="Habit completions over the last fourteen days">
-            {recentCompletions.map((completed, index) => {
-              const height = totalHabits ? (completed / totalHabits) * 100 : 0;
-              const isToday = index === recentCompletions.length - 1;
-
+          <div className="activity-chart" role="img" aria-label="Completion chart for the last 14 days">
+            {recentActivity.map(({ date, completed, isToday }) => {
+              const height = totalHabits > 0 ? (completed / totalHabits) * 100 : 0;
               return (
-                <div className="bar-column" key={`${firstChartDay}-${index}`}>
-                  <div
-                    className={`chart-bar ${isToday ? 'is-today' : ''}`}
-                    style={{ height: `${Math.max(height, 4)}%` }}
-                    title={`${completed} habits completed`}
-                  />
-                  <span>{String(firstChartDay + index).padStart(2, '0')}</span>
+                <div className="activity-chart__column" key={date.toISOString()}>
+                  <div className="activity-chart__track">
+                    <i
+                      className={`activity-chart__bar ${isToday ? 'is-today' : ''}`}
+                      style={{ height: `${Math.max(height, completed > 0 ? 5 : 0)}%` }}
+                    />
+                  </div>
+                  <span>{date.getDate()}</span>
                 </div>
               );
             })}
           </div>
-        </article>
+          <p className="activity-panel__caption">{monthlyCompletionRate}% average completion rate this month.</p>
+        </section>
       </div>
     </section>
   );
